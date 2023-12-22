@@ -1,0 +1,80 @@
+
+<!--<div class="container text-center card1">-->
+<!--  <div class="row align-items-start">-->
+<!--    <div class="col">-->
+<!--      <div class="card" style="width: 18rem;">-->
+<!--        <img src="/img/github-icon-logo-png-transparent.png" class="card-img-top" alt="/img/R.png">-->
+<!--        <div class="card-body">-->
+<!--          <h5 class="card-title">Card title</h5>-->
+<!--          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>-->
+<!--          <a href="#" class="btn btn-primary">Go somewhere</a>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div class="col">-->
+<!--      <div class="card" style="width: 18rem;">-->
+<!--        <img src="/img/R.png" class="card-img-top" alt="...">-->
+<!--        <div class="card-body">-->
+<!--          <h5 class="card-title">Card title</h5>-->
+<!--          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>-->
+<!--          <a href="#" class="btn btn-primary">Go somewhere</a>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div class="col">-->
+<!--      <div class="card" style="width: 18rem;">-->
+<!--        <img src="/img/R%20(12).png" class="card-img-top" alt="...">-->
+<!--        <div class="card-body">-->
+<!--          <h5 class="card-title">Card title</h5>-->
+<!--          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>-->
+<!--          <a href="#" class="btn btn-primary">Go somewhere</a>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div class="col">-->
+<!--      <div class="card" style="width: 18rem;">-->
+<!--        <img src="/img/Untitled-6-1920x1280.jpg" class="card-img-top" alt="...">-->
+<!--        <div class="card-body">-->
+<!--          <h5 class="card-title">Card title</h5>-->
+<!--          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>-->
+<!--          <a href="#" class="btn btn-primary">Go somewhere</a>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/mester-layout}">
+<head>
+        <title>Document</title>
+</head>
+<body>
+<main layout:fragment="main-content">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <a href="/article/new" class="btn btn-primary m-3" type="button" value="Input">View Artical</a>
+            </div>
+        </div>
+        <div class="row">
+            <div th:each="artical :${artical}" th:object="${artical}"  class="col-4">
+                <div class="">
+                    <div th:replace="~{fragment/card :: Card-action(*{author} , *{title} , *{thumbnail} , *{author})}"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="subScript">
+    <!--    individual web page script-->
+    <script>
+        console.log("hello bong");
+    </script>
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+server:
+  port: 9080
+spring:
+  data:
+    mongodb:
+      database: SSE
+      host: localhost
+      port: 27017
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  zipkin:
+    tracing:
+      endpoint: http://${CONFIG_SERVER_URL:localhost}:9411/api/v2/spans
+
+  endpoint:
+    health:
+      show-details: "ALWAYS"
+  tracing:
+    sampling:
+      probability: 1.0

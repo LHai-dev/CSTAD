@@ -1,0 +1,3 @@
+rootProject.name = 'jobroom'
+include ":microservice:jobroom_admin_service-master"
+

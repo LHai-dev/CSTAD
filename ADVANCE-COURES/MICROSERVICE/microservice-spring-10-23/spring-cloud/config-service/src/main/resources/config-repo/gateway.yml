@@ -1,0 +1,30 @@
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator: INFO
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.web.server.adapter.HttpWebHandlerAdapter: TRACE
+management.endpoint.gateway.enabled: true
+
+
+server.port: 8443
+
+
+
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    service-url:
+      defaultZone: ${EUREKA_SERVER_ADDRESS}
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  zipkin:
+    tracing:
+      endpoint: http://${CONFIG_SERVER_URL:localhost}:9411/api/v2/spans

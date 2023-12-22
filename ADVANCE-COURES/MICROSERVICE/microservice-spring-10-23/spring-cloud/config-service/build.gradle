@@ -1,0 +1,42 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.1.4'
+	id 'io.spring.dependency-management' version '1.1.3'
+}
+
+group = 'co.hai.microservices.core.config'
+version = '1.0.0-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	set('springCloudVersion', "2022.0.4")
+}
+dependencies {
+	implementation 'org.springframework.cloud:spring-cloud-config-server'
+
+	// https://mvnrepository.com/artifact/org.springframework.vault/spring-vault-dependencies
+	implementation 'org.springframework.vault:spring-vault-dependencies:3.0.0'
+
+	// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-netflix-eureka-client
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+	implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+tasks.named('test') {
+	useJUnitPlatform()
+}

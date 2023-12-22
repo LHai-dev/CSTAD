@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        bootstrap: true
+        native:
+          search-locations: classpath:/config
+        git:
+          uri: https://github.com/hai172212/configserver-microserivce.git
+server:
+  port: 8071

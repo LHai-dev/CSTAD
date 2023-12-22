@@ -1,0 +1,3 @@
+include ':aggregator-gradle'
+include ':order-service'
+include ':payment-service'

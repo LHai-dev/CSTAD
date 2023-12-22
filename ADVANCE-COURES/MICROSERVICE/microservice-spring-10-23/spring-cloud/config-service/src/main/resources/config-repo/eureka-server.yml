@@ -1,0 +1,13 @@
+server:
+  port: 8761
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER_ADDRESS} #http://${eureka.instance.hostname}:${PORT}/eureka/
+  server:
+    waitTimeInMsWhenSyncEmpty: 0
+    response-cache-update-interval-ms: 5000

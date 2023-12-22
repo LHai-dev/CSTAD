@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://34.87.36.136:1804/employee_service
+    username: spring
+    password: spring!@#
+  jpa:
+    hibernate:
+      ddl-auto: update
+server:
+  port: 8082
+
+

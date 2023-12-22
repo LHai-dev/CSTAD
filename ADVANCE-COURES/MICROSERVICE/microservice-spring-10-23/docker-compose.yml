@@ -1,0 +1,94 @@
+version: '3.8'
+services:
+  db-svc:
+    image: postgres:16.0-alpine
+    restart: always
+    volumes:
+      - ms-db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_USER: postgres
+    ports:
+      - "5432:5432"
+    networks:
+      micro_net:
+        ipv4_address: 172.23.0.3
+  zipkin-svc:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      micro_net:
+        ipv4_address: 172.23.0.4
+  config-service:
+    build:
+      context: .
+      dockerfile: spring-cloud/config-service/Dockerfile
+    container_name: configuration_server
+    ports:
+      - "8888:8888"
+    environment:
+      - SPRING_PROFILES_ACTIVE=native
+      - EUREKA_SERVER_ADDRESS=http://host.docker.internal:8761/eureka/
+      - CONFIG_SERVER_URL=host.docker.internal
+    depends_on:
+      - db-svc
+      - zipkin-svc
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8888/user-service/default" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  registry-svc:
+    build:
+      context: .
+      dockerfile: spring-cloud/service-registry/Dockerfile
+    container_name: service_registry
+    ports:
+      - "8761:8761"
+    environment:
+      - EUREKA_SERVER_ADDRESS=http://host.docker.internal:8761/eureka/
+      - CONFIG_SERVER_URL=host.docker.internal
+    depends_on:
+      config-service:
+        condition: service_healthy
+  api-geteway:
+    build:
+      context: .
+      dockerfile: spring-cloud/api-gateway/Dockerfile
+    container_name: api_gateway
+    ports:
+      - "8443:8443"
+    environment:
+      - EUREKA_SERVER_ADDRESS=host.docker.internal
+      - CONFIG_SERVER_URL=host.docker.internal
+    depends_on:
+      - config-service
+#  user-svc:
+#    build:
+#      context: .
+#      dockerfile: microservice/user-service/Dockerfile
+#    container_name: user_service
+#    ports:
+#      - "9096:9096"
+#    environment:
+#      - EUREKA_SERVER_ADDRESS=http://host.docker.internal:8761/eureka
+#      - CONFIG_SERVER_URL=host.docker.internal
+#    depends_on:
+#      config-svc:
+#        condition: service_healthy
+#    healthcheck:
+#      test: [ "CMD", "curl", "-f", "http://localhost:9096/api/v1/users" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+volumes:
+  ms-db:
+    driver: local
+networks:
+  micro_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.23.0.1/24

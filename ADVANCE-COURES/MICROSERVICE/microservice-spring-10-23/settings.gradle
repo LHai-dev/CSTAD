@@ -1,0 +1,16 @@
+include ':spring-cloud:config-service'
+include ':microservice:user-service'
+include ':microservice:department-service'
+include ':microservice:post-service'
+include ':spring-stream:kafkaStream'
+//include ':microservice:product-service'
+//include ':microservice:recommendation-service'
+//include ':microservice:review-service'
+//include ':microservice:product-conposite-service'
+//include ':microservice:article-service'
+
+include ':spring-cloud:DEVKH-AUTHENTICATION'
+
+//cloud-spring
+include ':spring-cloud:api-gateway'
+include ':spring-cloud:service-registry'

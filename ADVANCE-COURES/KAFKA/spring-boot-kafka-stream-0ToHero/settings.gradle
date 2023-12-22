@@ -1,0 +1,6 @@
+rootProject.name = 'kafkaStream'
+include ':orders-management-streams:orders-domain'
+
+include ':orders-management-streams:orders-streams-app'
+include ':greetingstream'
+include ':message'

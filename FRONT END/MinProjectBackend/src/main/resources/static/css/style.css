@@ -1,0 +1,12 @@
+.card1{
+    /*display: flex;*/
+    justify-content: space-evenly;
+    margin: 0 auto;
+    margin-top: 200px;
+
+}
+img{
+    height: 100px;
+    width: 200px;
+    object-fit: cover;
+}

@@ -1,0 +1,121 @@
+package com.learnkafkastreams.topology;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.common.serialization.Serde;
+import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.streams.KeyValue;
+import org.apache.kafka.streams.StreamsBuilder;
+import org.apache.kafka.streams.Topology;
+import org.apache.kafka.streams.kstream.Consumed;
+import org.apache.kafka.streams.kstream.Printed;
+import org.apache.kafka.streams.kstream.Produced;
+
+import java.util.Arrays;
+import java.util.Random;
+import java.util.stream.Collectors;
+@Slf4j
+public class GreetingTopology {
+    //TODO create TOPIC
+    public static String GREETINGS = "greetings";
+    public static String GREETING_UPPERCASE = "greetings_uppercase";
+
+    public static String NUMBER = "numbers";
+    public static String NUMBER_UPPERCASE = "numbers_uppercase";
+
+
+    /*
+     *  The Topology object returned represents the structure of your Kafka Streams application.
+     * In Kafka Streams,
+     *  a topology is a directed acyclic graph (DAG) of processing nodes,
+     *  where each node represents a processing step or a source/sink of data.
+     * */
+    public static Topology buildTopology() {
+        /*
+         * StreamsBuilder builder = new StreamsBuilder();
+         * : This creates an instance of StreamsBuilder,
+         *  which is the main entry point for defining a Kafka Streams topology.
+         * StreamsBuilder provides methods to add sources, processors,
+         *  and sinks to build the processing graph.
+         * @streamsBuilder
+         * */
+        StreamsBuilder streamsBuilder = new StreamsBuilder();
+        //TODO Serdes is the factory class in kafka stream that takes care of handing serializes and deserialization of key and value
+        var numberStream = streamsBuilder.stream(NUMBER, Consumed.with(Serdes.String(), Serdes.String()));
+
+        var modifiedNumberStream = numberStream
+                //TODO Operators in kafka Streams using Kstream API
+
+
+                //TODO filterNot ,filter
+                .filterNot(((key, value) -> value.length()>5))
+                //TODO Peek can not do logic just only log to see what going on inside your code
+                .peek(((key, value) -> {
+                    log.info("after filter : key : {}, value : {}",key,value);
+                }))
+                //TODO Map can map key and value
+                .map(((key, value) -> KeyValue.pair(key.toUpperCase(),value.toUpperCase())))
+
+                .peek((key, value) -> {
+                    log.info("after mapValue : key : {} , value : {}" ,key,value);
+                })
+
+                //TODO have only value no have key , key is null
+//                .mapValues((readOnlyKey, value) -> value.toUpperCase());
+                //TODO have key and value
+//                        .flatMap(((key, value) -> {
+//                            var newValues = Arrays.asList(value.split(""));
+//                            return newValues
+//                                    .stream()
+//                                    .map(val -> KeyValue.pair(key,val.toUpperCase()))
+//                                    .collect(Collectors.toList());
+//                        }));
+                // TODO can map only value
+                .flatMapValues(((key, value) -> {
+                    var newValues = Arrays.asList(value.split(""));
+                    return newValues
+                            .stream()
+                            .map(String::toUpperCase)
+                            .collect(Collectors.toList());
+                }));
+
+        //TODO merge this operator is used to combine two independent kafka streams into a single kafka Stream
+
+
+
+        numberStream.print(Printed.<String, String>toSysOut().withLabel("numberStream"));
+
+
+
+
+
+        modifiedNumberStream.print(Printed.<String, String>toSysOut().withLabel("modifiedNumberStream"));
+
+        modifiedNumberStream.to(NUMBER_UPPERCASE, Produced.with(Serdes.String(), Serdes.String()));
+
+
+
+
+        //TODO read data topic StreamsBuilder
+
+        var greetingsSStream = streamsBuilder.stream(GREETINGS
+                , Consumed.with(Serdes.String(), Serdes.String()));
+
+
+        greetingsSStream.print(Printed.<String, String>toSysOut().withLabel("greetingsSStream"));
+
+        //TODO Performer kafka topic
+
+        var modifiedStream = greetingsSStream.mapValues((readOnlyKey, value) -> value.toUpperCase());
+
+        modifiedStream.print(Printed.<String, String>toSysOut().withLabel("modifiedStream"));
+
+        //TODO And write back to kafka topic
+        modifiedStream.to(GREETING_UPPERCASE, Produced.with(Serdes.String(), Serdes.String()));
+        return streamsBuilder.build();
+    }
+
+    //TODO create Launcher class to executes buildTopology
+
+
+
+}

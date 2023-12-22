@@ -1,0 +1,47 @@
+spring:
+  profiles:
+    active: native
+  application:
+    name: config-service
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/config-repo
+# WARNING: Exposing all management endpoints over http should only be used during development, must be locked down in production!
+management.endpoint.health.show-details: "ALWAYS"
+management.endpoints.web.exposure.include: "*"
+
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          config:
+            server: DEBUG
+    root: info
+server:
+  port: 8888
+encrypt:
+  key: secretkey
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      department-service:
+        registerHealthIndicator: true
+#        ringBufferSizeInClosedState: 5
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        recordExceptions:
+          - org.springframework.web.client.HttpServerErrorException
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+          - org.springframework.web.client.ResourceAccessException
+      user-service:
+          registerHealthIndicator: true
+#          ringBufferSizeInClosedState: 6
+#          ringBufferSizeInHalfOpenState: 4
+          waitDurationInOpenState: 20s
+          failureRateThreshold: 60
+

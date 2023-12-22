@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" >
+<head>
+    <th:block th:replace="~{fragment/charset}"></th:block>
+    <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">News-coffee</title>
+    <th:block th:replace="~{fragment/style}"></th:block>
+
+</head>
+
+    <body>
+    <th:block th:replace="~{fragment/navBar}"></th:block>
+    <main layout:fragment="main-content">
+    <!--individual web page content-->
+
+
+    </main>
+    <th:block th:replace="~{fragment/footer}"></th:block>
+    <th:block th:replace="~{fragment/script}"></th:block>
+
+    <th:block layout:fragment="subscript">
+        <!-- individual web page script  -->
+    </th:block>
+
+
+</body>
+</html>

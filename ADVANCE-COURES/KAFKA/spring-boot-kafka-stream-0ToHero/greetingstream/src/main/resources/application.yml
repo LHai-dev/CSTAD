@@ -1,0 +1,58 @@
+server:
+  port: 9094
+spring:
+  application:
+    name: greeting-kafka-stream
+  profiles:
+    active: local
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  kafka:
+    streams:
+      bootstrap-servers: localhost:9092
+      application-id: greeting-kafka-stream
+    properties:
+      default:
+        deserialization:
+          exception:
+#            001. Handle Deserialization Error - Approach 1
+#            handler: org.apache.kafka.streams.errors.LogAndContinueExceptionHandler
+
+#            002. Handle Deserialization Error Using Custom Error Handler - Approach 2
+#            when error in 2 it still continues  and then close the application
+#            handler:  com.kafkastream.exceptionhandler.StreamsDeserializationErrorHandler
+        production:
+          exception:
+#            005. Handle Production Errors
+            handler: com.kafkastream.exceptionhandler.StreamsSerializationExceptionHandler
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: root
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: true
+        format_sql: true
+
+application:
+  id: orders-app
+
+topics:
+  - orders
+  - general_orders
+  - restaurant_orders
+  - general_orders_count
+  - restaurant_orders_revenue
+  - general_orders_revenue
+  - stores
+

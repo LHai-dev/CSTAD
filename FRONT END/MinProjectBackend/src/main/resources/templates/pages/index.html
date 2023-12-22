@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+layout:decorate="~{layouts/mester-layout}"
+>
+<head>
+
+    <title >INDEX</title>
+</head>
+<body>
+
+<main layout:fragment="main-content">
+    <!--    welcome ~ start-->
+<!--    <th:block th:replace="~{pages/article}"></th:block>-->
+    <!--    welcome ~ end-->
+
+
+<!--    <h2> this is all post page </h2>-->
+    <!--    welcome ~ start-->
+<!--    <th:block th:replace="~{fragment/welcome}"></th:block>-->
+    <!--    welcome ~ end-->
+
+    <!--    welcome ~ Start Card-->
+
+
+
+    <div class="container   mt-3 ">
+        <div class="row justify-content-center">
+            <div class="col-4  ">
+
+                <th:block th:each="article: ${articles}" th:object="${article}">
+                    <div th:replace="~{fragment/card ::CardRead-only(*{uuid} , *{title},*{thumbnail},*{author})}"></div>
+                </th:block>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!--    welcome ~ end Crad-->
+
+
+</main>
+
+</body>
+</html>

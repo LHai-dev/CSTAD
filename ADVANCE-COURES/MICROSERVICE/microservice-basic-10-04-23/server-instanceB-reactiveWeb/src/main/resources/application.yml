@@ -1,0 +1,36 @@
+server:
+  port: 9092
+
+spring:
+  data:
+    mongodb:
+      database: SSE
+      host: localhost
+      port: 27017
+
+  application:
+    name: service-instancesB
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: root
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: true
+        format_sql: true
+#logging:
+#  level:
+#    org.springframework: DEBUG
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+#spring.main.allow-bean-definition-overriding=true

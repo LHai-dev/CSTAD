@@ -1,0 +1,9 @@
+[submodule "OAuth2-Client"]
+	path = OAuth2-Client
+	url = https://github.com/hai172212/OAuth2-Client-SpringBoot3.1.6.git
+[submodule "Authorization-Server"]
+	path = Authorization-Server
+	url = https://github.com/hai172212/OAuth2AuthorizationServerDatabase-SpringBoot3.1.6-Public.git
+[submodule "product-server"]
+	path = product-server
+	url = https://github.com/hai172212/Resource-Server-SpringBoot3.1.6-.git

@@ -1,0 +1,13 @@
+server:
+  port: 9000
+#spring:
+#  security:
+#    oauth2:
+#      resourceserver: # Change "resourceServer" to "resourceserver"
+#        jwt:
+#          issuer-uri: http://localhost:8081/oauth2/jwks # Change "issuerUri" to "issuer-uri"
+logging:
+  level:
+    org:
+      springframework:
+        security: trace

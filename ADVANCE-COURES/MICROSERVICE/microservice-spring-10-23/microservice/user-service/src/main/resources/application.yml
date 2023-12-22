@@ -1,0 +1,201 @@
+spring:
+  profiles:
+    active: native
+  application:
+    name: user-service
+  config:
+    import: optional:configserver:http://${CONFIG_SERVER_URL:localhost}:8888
+
+logging:
+  level:
+    com.netflix: WARN
+    org.springframework.web: WARN
+    com.optimagrowth: DEBUG
+
+management.endpoints.enabled-by-default: true
+management.endpoint.health:
+  enabled: true
+  show-details: always
+#    we must also configure Spring Boot Actuator to add the circuit breaker health information that Resilience4j produces in the response to a request to its health endpoint
+management.health.circuitbreakers.enabled: true
+
+
+#     retry (circuitBreaker (rateLimiter (timeLimiter (bulkhead (function () ) ) ) ) )
+
+
+# ---------- circuitBreaker config code buffer ----------
+resilience4j:
+  circuitbreaker:
+    instances:
+      #      external instance configuration. (The name given to the circuit breaker in the annotation.)
+      external:
+        event-consumer-buffer-size: 10
+        failure-rate-threshold: 50
+        minimum-number-of-calls: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 5s
+        permitted-number-of-calls-in-half-open-state: 3
+        sliding-window-size: 10
+        sliding-window-type: count_based
+        register-health-indicator: true
+      # spring boot in Action Second Edition
+      userService:
+        #  Indicates whether to expose the configuration over the health endpoint
+        registerHealthIndicator: true
+        #        Sets the ring buffer size in the half-open state
+        #        ringBufferSizeInHalfOpenState: 3
+        #        Sets the wait duration for the open state
+        #        waitDurationInOpenState—Sets the time the circuit breaker should wait before changing the status from open to half-open.
+        #        The default value is 60,000 ms.
+        waitDurationInOpenState: 10s
+        minimum-number-of-calls: 5
+        permitted-number-of-calls-in-half-open-state: 2
+        #        Sets the failure(បរាជ័យ) rate(អត្រា) threshold percentage(ភាគរយនៃកម្រិត)
+        #        failureRateThreshold—Configures the percentage of the failure rate threshold.
+        #  Remember, when the failure rate is greater than or equal to this threshold,
+        #  the circuit breaker changes to the open state and starts short-circuiting calls. The default value is 50.
+        failureRateThreshold: 50
+        #        Sets the exceptions that should be recorded as failures
+        #        recordExceptions—Lists the exceptions that will be considered as failures.
+        #  By default, all exceptions are recorded as failures.
+        recordExceptions:
+          - org.springframework.web.client.HttpServerErrorException
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+          - org.springframework.web.client.ResourceAccessException
+  retry:
+    instances:
+      retryUserService:
+        maxAttempts: 5
+        wait-duration: 10s
+
+
+
+          #  #     ----------   Bulkhead config  ----------
+          #  #  If we set no further values in the application properties,
+          #  #  Resilience4j uses the default values previously mentioned for the semaphore bulkhead type.
+          #  bulkhead:
+          #    instances:
+          #      bulkheadUserService:
+          #        #        The maximum amount of time to block a thread
+          #        #        maxWaitDuration—Sets the maximum amount of time to block a thread when entering a bulkhead. The default value is 0.
+          #        maxWaitDuration: 25ms
+          #        #        The maximum number of concurrent calls
+          #        #        maxConcurrentCalls—Sets the maximum number of concurrent calls allowed by the bulkhead. The default value is 25.
+          #        maxConcurrentCalls: 2
+          #
+          #  thread-pool-bulkhead:
+          #    instances:
+          #      bulkheadUserService:
+          #        #        The maximum number of threads in the thread pool
+          #        #        maxThreadPoolSize—Sets the maximum thread pool size. The default value is Runtime.getRuntime().availableProcessors()
+          #        maxThreadPoolSize: 1
+          #        #        The core thread pool size
+          #        #        coreThreadPoolSize—Sets the core thread pool size. The default value is Runtime.getRuntime().availableProcessors().
+          #        coreThreadPoolSize: 1
+          #        #        The queue’s capacity
+          #        #        queueCapacity—Sets the capacity of the queue. The default value is 100.
+          #        queueCapacity: 1
+          #        #        The maximum time that idle threads wait for new tasks before terminating
+          #        #        KeepAliveDuration—Sets the maximum time that idle threads will wait for new tasks before terminating. This happens when the number of threads is higher than the number of core threads. The default value is 20 ms
+          #        keepAliveDuration: 20ms
+          #
+          #
+          #
+
+
+          #  # ---------- Implementing the retry pattern ----------
+          #  retry:
+          #    instances:
+          #      retryUserService:
+          #        #        The maximum number of retry attempts
+          #        #        allows us to define the maximum number of retry attempts for our service. The default value for this parameter is 3
+          #maxAttempts: The number of attempts before giving up, including the first call. We will set this parameter to 3, allowing a maximum of two retry attempts after an initial failed call.
+          #        max-attempts: 5
+          #        #        The wait duration between the retry attempts
+          #        #        allows us to define the wait duration(រយៈពេល) between the retry attempts(ព្យាយាមម្តងទៀត)
+          #        #        The default value for this parameter is 500 ms
+          #        waitDuration: The wait time before the next retry attempt. We will set this value to 1000 ms, meaning that we will wait 1 second between retries.
+          #        waitDuration: 10000
+          #        #  The list of exceptions you want to retry
+        #        #        sets a list of error classes that will be retried. The default value is empty
+        #retryExceptions: A list of exceptions that will trigger a retry.
+        #  We will only trigger retries on InternalServerError exceptions, that is, when HTTP requests respond with a 500 status code.
+  #        retry-exceptions:
+  #          - java.util.concurrent.TimeoutException
+  #  #        intervalFunction—Sets a function to update the waiting interval(ចន្លោះពេល) after a failure(បរាជ័យ).
+  #  #        interval-bi-function:
+  #  #          retryOnResultPredicate—Configures a predicate(ព្យាករណ៍) that evaluates(វាយតម្លៃ) if a result should be retried(បានព្យាយាមម្តងទៀត). This predicate should return true if we want to retry.
+  #  #        retry-exception-predicate:
+  #  #          ignoreExceptions—Sets a list of error classes that are ignored and will not be retried. The default value is empty.
+  #  #        ignore-exceptions:
+  #
+  #        note Be careful when configuring retry and circuit breaker settings so that, for example, the circuit breaker doesn’t open the circuit before the intended number of retries has been completed!
+
+  #  ----------Implementing the rate limiter pattern---------
+  #   Resilience4j provides two implementations for the rate limiter pattern:
+  #   AtomicRateLimiter and SemaphoreBasedRateLimiter. The default implementation for the RateLimiter is the AtomicRateLimiter.
+  #  The SemaphoreBasedRateLimiter is the simplest.
+  #  This implementation is based on having one java.util.concurrent.Semaphore store the current permissions.
+  #  In this scenario, all the user threads will call the method semaphore.
+  #  tryAcquire to trigger a call to an additional internal thread by executing semaphore.release when a new limitRefreshPeriod starts.
+
+
+
+#  ratelimiter:
+#    instances:
+#      userService:
+#        #        Defines the time a thread waits for permission
+#        #        timeoutDuration, lets us define the time a thread waits for permission; the default value for this parameter is 5 s (seconds)
+#        timeoutDuration: 10ms
+#        #        Defines the period of a limit refresh
+#        #        limitRefreshPeriod, enables us to set the period that limits the refresh. After each period, the rate
+#        #        Defines the number of permissions available during a limit refresh period imiter resets the permissions count back to the limitForPeriod value.
+#        #        The default value for the limitRefreshPeriod is 500 ns (nanoseconds).
+#        limitRefreshPeriod: 5000
+#        #  limitForPeriod, lets us set the number of permissions available during one refresh period.
+#        #  The default value for the limitForPeriod is 50.
+#        #  The following listing demonstrates how to set up the retry pattern around all calls surrounding the lookup of licensing data from our licensing service.
+#        limitForPeriod: 5
+#        allow-health-indicator-to-fail: true
+#        subscribe-for-events: true
+#        register-health-indicator: true
+
+#  Summary
+#  When designing highly distributed applications like a microservice, client resiliency must be taken into account.
+#  Outright failures of a service (for example, the server crashes) are easy to detect and deal with.
+#  A single, poorly performing service can trigger a cascading effect of resource exhaustion as the threads in the calling client are blocked when waiting for a service to complete.
+#  Three core client resiliency patterns are the circuit-breaker pattern, the fallback pattern, and the bulkhead pattern.
+#  The circuit breaker pattern seeks to kill slow-running and degraded system calls so that these calls fail fast and prevent resource exhaustion.
+#  The fallback pattern allows you to define alternative code paths in the event that a remote service call fails or the circuit breaker for the call fails.
+#  The bulkhead pattern segregates remote resource calls away from each other, isolating calls to a remote service into their own thread pool. If one set of service calls fails, its failure shouldn’t be allowed to “eat up” all the resources in the application container.
+#  The rate limiter pattern limits the number of total calls in a given time period.
+#  Resilience4j allows us to stack and use several patterns at the same time.
+#  The retry pattern is responsible for making attempts when a service has temporarily failed.
+#  The main difference between the bulkhead and the rate limiter patterns is that the bulkhead is in charge of limiting the number of concurrent calls at one time, and the rate limiter limits the number of total calls over a given time.
+#  Spring Cloud and the Resilince4j libraries provide implementations for the circuit breaker, fallback, retry, rate limiter, and bulkhead patterns.
+#  The Resilience4j libraries are highly configurable and can be set at global, class, and thread pool levels
+
+
+#resilience4j.timelimiter:
+#  instances:
+#    product:
+#      timeoutDuration: 2s
+#resilience4j.circuitbreaker:
+#  instances:
+#    product:
+#      allowHealthIndicatorToFail: false
+#      registerHealthIndicator: true
+#      slidingWindowType: COUNT_BASED
+#      slidingWindowSize: 5
+#      failureRateThreshold: 50
+#      waitDurationInOpenState: 10000
+#      permittedNumberOfCallsInHalfOpenState: 3
+#      automaticTransitionFromOpenToHalfOpenEnabled: true
+#      ignoreExceptions:
+#  se.magnus.api.exceptions.InvalidInputException
+#  - se.magnus.api.exceptions.NotFoundException
+#  Adding the retry annotation
+#  @Retry(name = "product")
+#  @TimeLimiter(name = "product")
+#  http://localhost:8080/actuator/retryevents

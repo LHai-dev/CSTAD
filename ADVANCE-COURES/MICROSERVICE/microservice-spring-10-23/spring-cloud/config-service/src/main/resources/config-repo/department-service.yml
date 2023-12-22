@@ -1,0 +1,53 @@
+server:
+  port: 9095
+spring:
+  datasource:
+    url: jdbc:postgresql://${CONFIG_SERVER_URL:localhost}:5432/postgres
+    username: postgres
+    password: root
+    # {cipher} eec91f0c16245ed372138103ea3332c743bc6e938e0dfd30dfe2d99b23f330fb
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: true
+        format_sql: true
+eureka:
+  instance:
+    client:
+      registerWithEureka: true
+      fetchRegistry: true
+      serviceUrl:
+        defaultZone: ${EUREKA_SERVER_ADDRESS}
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  zipkin:
+    tracing:
+      endpoint: http://${CONFIG_SERVER_URL:localhost}:9411/api/v2/spans
+
+  endpoint:
+    health:
+      show-details: "ALWAYS"
+  tracing:
+    sampling:
+      probability: 1.0
+
+#spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
+#spring.datasource.username=postgres
+#  #{cipher} aee0302eebad17524304d0d4f4f319586fe6295fcb543cfca1429d808d76ab4a
+#spring.datasource.password=root
+#spring.datasource.driver-class-name=org.postgresql.Driver
+#spring.jpa.hibernate.ddl-auto=update
+#spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+#spring.jpa.properties.hibernate.show_sql=true
+#spring.jpa.properties.hibernate.format_sql=true
+#server.port=9091
+##eureka.instance.client.serviceUrl.defaultZone=http://localhost:8761/eureka/
